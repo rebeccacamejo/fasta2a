@@ -83,7 +83,6 @@ async def subtract(x: int, y: int) -> int:
 ```
 
 The agent card will now include a `skills` section grouping related tools.
-```
 
 Running this script will start a FastAPI server exposing:
 
