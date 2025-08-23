@@ -12,12 +12,12 @@ integration hooks for the Model Context Protocol (MCP).
 Key concepts from the A2A protocol include:
 
 * **Capability discovery**: A2A agents advertise their capabilities via a
-  card, allowing other agents to determine if they can satisfy a
-  request【234393459519911†L234-L243】.
+  card, specifically through "skills", allowing other agents to determine if they can satisfy a
+  request.
 * **Task management**: Communication is oriented around tasks which may
-  complete immediately or run for an extended period of time【234393459519911†L245-L249】.
+  complete immediately or run for an extended period of time.
 * **Collaboration via messages**: Agents exchange messages to provide
-  context, artifacts and updates【234393459519911†L252-L253】.
+  context, artifacts and updates.
 
 FastA2A encapsulates these concepts in a Pythonic API built on top of
 FastAPI.  See the individual submodules for more details.
