@@ -5,7 +5,7 @@ fully‑featured A2A server.  The design draws inspiration from
 FastMCP—tools are defined with simple Python functions and decorated
 to expose them as A2A tasks.  Under the hood, FastAPI handles HTTP
 requests, Pydantic validates inputs, and the tool registry generates
-an agent card for capability discovery【234393459519911†L234-L243】.
+an agent card for capability discovery.
 
 The core of the module is :class:`A2AApp`, which encapsulates a
 FastAPI application and exposes methods to register tools, events and
@@ -322,10 +322,10 @@ class A2AApp:
         >>> app = A2AApp()
         >>> @app.tool()
         ... async def add(x: int, y: int) -> int:
-        ...     """Add two integers.
+        ...     Add two integers.
         ...     x: first integer
         ...     y: second integer
-        ...     """
+        ...     
         ...     return x + y
         >>> # The tool is now available at POST /tools/add
         
@@ -426,7 +426,7 @@ class A2AApp:
         """Assemble the agent card as a dictionary.
 
         The card contains metadata about the agent and its registered
-        tools.  Clients use the card for capability discovery【234393459519911†L234-L243】.
+        tools.  Clients use the card for capability discovery.
         """
         card = {
             "name": self.app.title,
