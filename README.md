@@ -4,7 +4,7 @@ FastA2A is a Python framework for building and consuming Agent‑to‑Agent (A2A
 
 ## Key Concepts
 
-A2A facilitates communication between a **client agent** and a **remote agent**.  The client formulates tasks and messages, while the remote agent acts on those requests and returns artifacts.  The protocol emphasises:
+A2A facilitates communication between a **client agent** and a **remote agent**.  The client formulates tasks and messages, while the remote agent acts on those requests and returns artifacts.  The protocol emphasizes:
 
 - **Capability discovery** via an *agent card* that lists available tools.
 - **Task management** with support for both short and long‑running jobs.
