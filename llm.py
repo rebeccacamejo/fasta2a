@@ -9,7 +9,7 @@ concrete subclasses implement provider‑specific logic.
 Agents built on A2A can select the desired provider at runtime or
 compose responses from multiple providers.  This flexibility aligns
 with the protocol's goal of modality independence and agent
-interoperability【234393459519911†L223-L259】.
+interoperability.
 """
 
 from __future__ import annotations
