@@ -26,11 +26,11 @@ def parse_docstring(func) -> Tuple[str, Dict[str, str]]:
     --------
 
     >>> def foo(x, y):
-    ...     """Add two numbers.
+    ...     '''Add two numbers.
     ...
     ...     x: the first number
     ...     y: the second number
-    ...     """
+    ...     '''
     ...     return x + y
     >>> parse_docstring(foo)
     ('Add two numbers.', {'x': 'the first number', 'y': 'the second number'})

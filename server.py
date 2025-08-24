@@ -149,21 +149,36 @@ class A2AApp:
     # ------------------------------------------------------------------
     # Skill registration
     # ------------------------------------------------------------------
-    def register_skill(self, tool_name: str, category: str, description: str) -> None:
+    def register_skill(
+        self,
+        tool_name: str,
+        category: str,
+        category_description: str,
+        tool_description: Optional[str] = None,
+    ) -> None:
         """Associate a tool with a skill category.
 
-        Skills group related tools under a common heading in the agent
-        card.  Each category may include a description and a list of
-        tools.  Repeated calls with the same category will append
-        additional tools to the existing category.
+        Parameters
+        ----------
+        tool_name:
+            Name of the tool being associated.
+        category:
+            Skill category name.
+        category_description:
+            Description of the skill category.
+        tool_description:
+            Optional description for the tool. Defaults to
+            ``category_description``.
         """
         cat = self._skills.get(category)
         if cat is None:
-            cat = {"description": description, "tools": []}
+            cat = {"description": category_description, "tools": []}
             self._skills[category] = cat
         # Append the tool if not already present
         if tool_name not in [t["name"] for t in cat["tools"]]:
-            cat["tools"].append({"name": tool_name, "description": description})
+            cat["tools"].append(
+                {"name": tool_name, "description": tool_description or category_description}
+            )
 
     def skill(self, category: str, description: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
         """Decorator to categorise a tool under a skill.
@@ -185,7 +200,14 @@ class A2AApp:
         >>> # The agent card will include a skills entry for "math".
         """
         def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
-            self._pending_skill_info.setdefault(func, []).append((category, description))
+            # If the tool is already registered, associate immediately
+            for name, td in self._tools.items():
+                if td.func is func:
+                    self.register_skill(name, category, description, td.description)
+                    break
+            else:
+                # Otherwise store metadata until the tool is registered
+                self._pending_skill_info.setdefault(func, []).append((category, description))
             return func
         return decorator
 
@@ -241,7 +263,11 @@ class A2AApp:
             input_model = create_model(f"{tool_name.capitalize()}Input", **model_fields)  # type: ignore
             # Add descriptions to the field schema
             for field_name, (_, _, desc) in fields.items():
-                if desc:
+                if not desc:
+                    continue
+                if hasattr(input_model, "model_fields"):
+                    input_model.model_fields[field_name].description = desc  # type: ignore[attr-defined]
+                else:  # Pydantic v1
                     input_model.__fields__[field_name].field_info.description = desc
 
         # Determine output model
@@ -276,10 +302,14 @@ class A2AApp:
         # If the function was annotated with skill metadata, register it now
         pending = self._pending_skill_info.pop(func, [])
         for category, cat_desc in pending:
-            self.register_skill(tool_name, category, cat_desc)
+            self.register_skill(tool_name, category, cat_desc, tool_desc)
 
         # Register the FastAPI route
-        async def endpoint(request: Request, payload: input_model = Depends(), auth_ctx: Optional[dict] = Depends(self._auth_backend) if self._auth_backend else None) -> JSONResponse:  # type: ignore
+        async def endpoint(
+            payload: input_model,  # type: ignore[valid-type]
+            request: Request,
+            auth_ctx: Optional[dict] = Depends(self._auth_backend) if self._auth_backend else None,
+        ) -> JSONResponse:
             """Dynamically generated endpoint for the tool."""
             try:
                 result = await definition.func(**payload.dict())
